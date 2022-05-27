@@ -1,0 +1,16 @@
+﻿@inherits LayoutComponentBase
+<div class="content-wrapper @IsInARoomClass">
+    <div class="content-container">
+        @Body
+        <footer class="footer-container">
+            <ul class="footer-content">
+                <li>
+                    <button class="footer-content-button footer-content-button-color-light @IsInARoomClass"
+                            type="button">
+                        <span>Built by the awesome Blazor Team &copy; Cegeka 2021 @*- @DateTime.Now.Year*@</span>
+                    </button>
+                </li>
+            </ul>
+        </footer>
+    </div>
+</div>

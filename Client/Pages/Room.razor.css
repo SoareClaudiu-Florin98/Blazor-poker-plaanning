@@ -1,0 +1,267 @@
+.container-room {
+    min-height: 90vh;
+    width: 100%;
+    display: flex;
+    align-items: flex-start;
+    justify-content: center;
+    color: white;
+    flex-direction: column;
+    font-family: sans-serif;
+}
+.header-container-nav {
+    min-height: 10vh;
+}
+.header-content-logo{
+    float: left;
+}
+.header-content-theme {
+    float: right;
+    margin-right: 5%;
+    cursor: pointer;
+}
+*:focus {
+    outline: none;
+}
+.room-button{
+    font-size: 2em;
+}
+.room-button-head {
+    font-size: 2em;
+    float: right;
+    margin-right: 5%;
+    background-color: transparent;
+    border: none;
+    color: black;
+    padding: 15px 32px;
+    text-align: center;
+    text-decoration: none;
+    display: inline-block;
+}
+.room-content {
+    margin: auto;
+}
+.voting-card {
+    transition-duration: .2s, 1s;
+    transition-timing-function: linear, ease-in;
+    transition-delay: 0s, 1s;
+    background-color: #4b9ccc;
+    border: none;
+    color: white;
+    display: inline-block;
+    width: 3em;
+    height: 4em;
+    border-radius: 0.2em;
+    margin: 0.2em;
+    padding: 0;
+}
+
+.voting-card.empty-card {
+    background-color: rgba(0, 0, 0, 0.1);
+    color: rgba(0, 0, 0, 0);
+    background-image: none;
+    border: 1px solid #e9ecef;
+    cursor: default;
+}
+
+.creator-buttons {
+    margin-top: 30px;
+}
+
+.creator-buttons button {
+    height: 2em;
+    width: 8em;
+    border-radius: 6px;
+    background-color: #FFFFFF;
+    border: 1px solid #222222;
+    border-radius: 8px;
+    box-sizing: border-box;
+    color: #222222;
+}
+@media (max-width: 920px) {
+    .voting-card {
+        width: 4em;
+        height: 5em;
+    }
+    .header-content-logo img {
+        width: 80%;
+        height: 80%;
+    }
+    .room-content {
+        margin: auto;
+    }
+
+    .room-button {
+        font-size: 2em;
+    }
+
+    .creator-buttons button {
+        height: 2em;
+        width: 5em;
+    }
+}
+
+@media (max-width: 600px) {
+    .voting-card {
+        width: 2em;
+        height: 3em;
+        text-align: center;
+    }
+}
+
+@media (max-width: 511px) {
+    .room-content {
+        margin: 0px;
+    }
+
+    .room-button-head {
+        width: 10%;
+        margin: 0px;
+        padding: 0px;
+    }
+    .header-content-logo img {
+        width: 70%;
+        height: 70%;
+    }
+    .header-content-theme {
+        width: 20%;
+        margin: 0px;
+        padding: 0px;
+    }
+    .creator-buttons button {
+        border: 0.5px solid black;
+    }
+
+    .room-button-head {
+        float: left;
+    }
+
+}
+.creator-buttons button:focus-visible {
+    box-shadow: #222222 0 0 0 2px, rgba(255, 255, 255, 0.8) 0 0 0 4px;
+    transition: box-shadow .2s;
+}
+
+.creator-buttons button:active {
+    background-color: #F7F7F7;
+    border-color: #000000;
+    transform: scale(.96);
+}
+
+.creator-buttons button:disabled {
+    border-color: #DDDDDD;
+    color: #DDDDDD;
+    cursor: not-allowed;
+    opacity: 1;
+}
+
+.votesList {
+    display: flex;
+}
+
+.votesList.hidden-votes {
+    display: none;
+}
+
+.voting-card.hidden-vote-options {
+    background: #2db34a;
+    transition-duration: .2s, 1s;
+    transition-timing-function: linear, ease-in;
+    transition-delay: 0s, 1s;
+    cursor: not-allowed;
+    opacity: 0.85;
+    background-color: #ef4d4e;
+    border: none;
+    color: white;
+    text-decoration: none;
+    display: inline-block;
+    opacity: 0.85;
+}
+
+.voter-button {
+    transition-duration: .2s, 1s;
+    transition-timing-function: linear, ease-in;
+    transition-delay: 0s, 1s;
+    background-color: #8cd3dc;
+    border: 1px solid transparent;
+    color: white;
+    padding: 10px;
+    text-align: center;
+    font-family: sans-serif;
+    text-decoration: none;
+    display: inline-block;
+    font-size: 16px;
+    margin: 4px 2px;
+    -webkit-border-radius: 3px;
+    border-radius: 3px;
+    -webkit-transition: all 0.3s ease-in-out;
+    -moz-transition: all 0.3s ease-in-out;
+    transition: all 0.3s ease-in-out;
+}
+
+.voter-button:hover {
+    background-color: #ffffff;
+    color: #8cd3dc;
+    border-color: #8cd3dc;
+}
+
+.toast-icon {
+    display: flex;
+    flex-direction: column;
+    justify-content: center;
+    padding: 0.1rem;
+    font-size: 2.5rem;
+}
+
+.toast-body {
+    display: flex;
+    flex-direction: column;
+    flex: 1;
+    padding-left: 1rem;
+}
+
+.toast-body p {
+    margin-bottom: 0;
+}
+
+.toast-visible {
+    display: flex;
+    flex-direction: row;
+    animation: fadein 0.8s;
+    padding: 1.5rem;
+    color: #fff;
+    z-index: 1;
+    position: absolute;
+    top: 6rem;
+    border-radius: 1rem;
+    background-color: #4b9ccc;
+    right: 3rem;
+    font-size: 2rem;
+}
+
+@keyframes fadein {
+    from {
+        opacity: 0;
+    }
+    to {
+        opacity: 1;
+    }
+}
+
+.pointer {
+    cursor: pointer;
+}
+
+span.oi.oi-x {
+    font-size: 1.1rem;
+    margin-left: 3rem;
+    margin-right: 1rem;
+    cursor: pointer;
+}
+
+span.oi.oi-share-boxed {
+    font-size: 2rem;
+}
+
+span.oi.oi-check {
+    margin-right: 1.2rem;
+}

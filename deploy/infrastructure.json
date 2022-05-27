@@ -1,0 +1,105 @@
+{
+    "$schema": "https://schema.management.azure.com/schemas/2019-04-01/deploymentTemplate.json#",
+    "contentVersion": "1.0.0.0",
+    "parameters": {
+        "webAppName": {
+            "type": "string",
+            "defaultValue": "[concat('app-poker-planning-', uniqueString(resourceGroup().id))]",
+            "minLength": 2,
+            "metadata": {
+                "description": "Web app name"
+            }
+        },
+        "location": {
+            "type": "string",
+            "defaultValue": "[resourceGroup().location]",
+            "metadata": {
+                "description": "Location for all resources"
+            }
+        },
+        "sku": {
+            "type": "string",
+            "metadata": {
+                "description": "The SKU of App Service Plan"
+            },
+            "allowedValues": [
+                "B1",
+                "B2",
+                "B3",
+                "D1",
+                "F1",
+                "FREE",
+                "I1",
+                "I1v2",
+                "I2",
+                "I2v2",
+                "I3",
+                "I3v2",
+                "P1V2",
+                "P1V3",
+                "P2V2",
+                "P2V3",
+                "P3V2",
+                "P3V3",
+                "PC2",
+                "PC3",
+                "PC4",
+                "S1",
+                "S2",
+                "S3",
+                "SHARED"
+            ]
+        },
+        "netVersion": {
+            "type": "string",
+            "defaultValue": "v5.0"
+        }
+    },
+    "variables": {
+        "appServicePlanName": "[concat('plan-', parameters('webAppName'))]"
+    },
+    "resources": [
+        {
+            "type": "Microsoft.Web/serverfarms",
+            "apiVersion": "2020-12-01",
+            "name": "[variables('appServicePlanName')]",
+            "location": "[parameters('location')]",
+            "sku": {
+                "name": "[parameters('sku')]"
+            },
+            "properties": {
+            }
+        },
+        {
+            "type": "Microsoft.Web/sites",
+            "apiVersion": "2020-12-01",
+            "name": "[parameters('webAppName')]",
+            "location": "[parameters('location')]",
+            "dependsOn": [
+                "[resourceId('Microsoft.Web/serverfarms', variables('appServicePlanName'))]"
+            ],
+            "kind": "app",
+            "properties": {
+                "serverFarmId": "[resourceId('Microsoft.Web/serverfarms', variables('appServicePlanName'))]",
+                "siteConfig": {
+                    "alwaysOn": true,
+                    "netFrameworkVersion": "[parameters('netVersion')]",
+                    "minTlsVersion": "1.2",
+                    "appSettings": [],
+                    "numberOfWorkers": 1
+                },
+                "httpsOnly": true
+            }
+        }
+    ],
+    "outputs": {
+        "webAppName": {
+            "type": "string",
+            "value": "[parameters('webAppName')]"
+        },
+        "webAppUrl": {
+            "type": "string",
+            "value": "[reference(resourceId('Microsoft.Web/sites', parameters('webAppName'))).defaultHostName]"
+        }
+    }
+}

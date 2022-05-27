@@ -1,0 +1,100 @@
+trigger:
+- refs/heads/main
+
+variables:
+  solution: '**/BlazorPokerPlanning.sln'
+  buildPlatform: 'Any CPU'
+  buildConfiguration: 'Release'
+
+pool:
+  vmImage: 'windows-latest'
+
+stages:
+  - stage: Build
+    displayName: Build
+    pool:
+      vmImage: 'windows-latest'
+    jobs:
+      - job: 'Build'
+        steps:
+          - task: DotNetCoreCLI@2
+            displayName: 'Build'
+            inputs:
+              command: 'build'
+              projects: '$(solution)'
+              arguments: '--configuration $(buildConfiguration)'
+
+          - task: DotNetCoreCLI@2
+            displayName: 'Publish'
+            inputs:
+              command: 'publish'
+              publishWebProjects: false
+              projects: '**/BlazorPokerPlanning.Server.csproj'
+              arguments: '--configuration $(buildConfiguration) --output $(Build.ArtifactStagingDirectory)'
+
+          - task: CopyFiles@2
+            displayName: 'Copy ARM and Powershell scripts to ArtifactStaging'
+            inputs:
+              SourceFolder: '$(Build.SourcesDirectory)'
+              Contents: '**/deploy/?(*.ps1|*json)'
+              TargetFolder: '$(Build.artifactstagingdirectory)'
+
+          - task: PublishBuildArtifacts@1
+            inputs:
+              PathtoPublish: '$(Build.ArtifactStagingDirectory)'
+              ArtifactName: 'drop'
+              publishLocation: 'Container'
+              
+  - stage: Release
+    displayName: Release
+    condition: and(succeeded(), eq(variables['build.sourceBranch'], 'refs/heads/main'))
+    pool:
+      vmImage: 'windows-latest'
+    jobs:
+      - deployment: Release
+        environment: 'PokerPlanning_Test'
+        displayName: 'Deploy to Production'
+        strategy:
+          runOnce:
+            deploy:
+              steps:
+                - download: current
+                  displayName: 'Download current artifacts'
+                  artifact: drop
+
+                - task: AzureResourceManagerTemplateDeployment@3
+                  displayName: 'ARM Template Deployment'
+                  inputs:
+                    deploymentScope: 'Resource Group'
+                    azureResourceManagerConnection: 'PokerPlanning'
+                    subscriptionId: '$(azureSubscriptionId)'
+                    action: 'Create Or Update Resource Group'
+                    resourceGroupName: 'rg-poker-planning'
+                    location: 'West Europe'
+                    templateLocation: 'Linked artifact'
+                    csmFile: '$(Pipeline.Workspace)/**/deploy/infrastructure.json'
+                    csmParametersFile: '$(Pipeline.Workspace)/**/drop/deploy/infrastructure.parameters.json'
+                    deploymentMode: 'Incremental'
+                    deploymentOutputs: 'ARM_OUTPUTS'
+                
+                - pwsh: |
+                    $outputsObject = $env:ARM_OUTPUTS | ConvertFrom-Json
+                    Write-Host "##vso[task.setvariable variable=webAppName]$($outputsObject.webAppName.value)"
+                    Write-Host "##vso[task.setvariable variable=webAppUrl]$($outputsObject.webAppUrl.value)"
+                  displayName: 'Parse ARM deploymentOutputs'
+                  env:
+                    ARM_OUTPUTS: $(armOutputs)
+
+                - task: AzureRmWebAppDeployment@4
+                  displayName: Deploy to AppService
+                  inputs:
+                    ConnectionType: 'AzureRM'
+                    azureSubscription: 'PokerPlanning'
+                    appType: 'webApp'
+                    WebAppName: '$(webAppName)'
+                    packageForLinux: '$(Pipeline.Workspace)/**/*.zip'
+                
+                - pwsh: |
+                    Write-Output $(webAppName)
+                    Write-Output $(webAppUrl)
+                  displayName: 'Result'

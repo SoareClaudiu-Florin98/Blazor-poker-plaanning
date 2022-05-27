@@ -1,0 +1,95 @@
+﻿@page "/room/{roomId}"
+<div class="header-container-nav">
+    @if (!IsDarkMode)
+    {
+        <a class="header-content-logo" href="https://www.cegeka.com/">
+            <img src="cegeka-logo-color.webp" />
+        </a>
+
+    }
+    else
+    {
+        <a class="header-content-logo" href="https://www.cegeka.com/">
+            <img src="cegeka-logo-white.webp" />
+        </a>
+    }
+    <a class="header-content-theme" @onclick="ActivateDarkModeOrLightMode">
+        <img src="brightness_4.svg" />
+    </a>
+
+    @if (!IsDarkMode)
+    {
+        <button class="room-button-head" @onclick="CopyLink">
+            <span class="oi oi-share-boxed"></span>
+            Copy URL
+        </button>
+    }
+    else
+    {
+        <button class="room-button-head" style="color: white;" @onclick="CopyLink">
+            <span class="oi oi-share-boxed" style="color: white;"></span>
+            Copy URL
+        </button>
+
+    }
+
+</div>
+<div class="container-room">
+
+    <div class="room-content">
+        @if (State.EstimationPacks != null)
+        {
+            <div class="creator-buttons" hidden="@(!CanChangePack)">
+             <select @onchange="ChangeEstimationPack">
+                 @foreach (var c in State.EstimationPacks)
+                 {
+                     <option value="@c.Id">@c.Name</option>
+                 }
+             </select>
+         </div>
+        }
+        
+        @if (State.SelectedEstimationPack != null)
+        {
+            <div id="voteOptionsList">
+                @foreach (var voteOption in State.SelectedEstimationPack.VoteOptions)
+                {
+                    <button class="room-button voting-card @VisibilityVoteOptions" @onclick="() => Vote(voteOption)" disabled=@(!State.User.IsAVoter)>@voteOption</button>
+                }
+            </div>
+        }
+
+        <div class="voter-control">
+            <button class="voter-button" @onclick="ChangeIsAVoterStatus">@GetVotingStatus</button>
+        </div>
+        <div class="votesList">
+            @foreach (var vote in State.Votes)
+            {
+                <button class="room-button voting-card @(string.IsNullOrWhiteSpace(vote.Value) ? "empty-card" : "")">@GetVoteValue(vote)</button>
+            }
+        </div>
+
+        <div class="creator-buttons" hidden="@(!CanManageRoom)">
+            <button class="room-button" @onclick="Reset">Reset</button>
+            <button class="room-button" @onclick="Reveal">Reveal</button>
+        </div>
+    </div>
+</div>
+
+
+@if (urlCopiedToClipboard)
+{
+    <div class="toast-container">
+        <div class="toast-visible">
+            <div class="toast-icon">
+                <span class="oi oi-check"></span>
+            </div>
+            <div class="toast-body">
+                <small>URL was copied to clipboard!</small>
+            </div>
+            <div class="toast-icon pointer" @onclick="CloseNotification">
+                <span class="oi oi-x"></span>
+            </div>
+        </div>
+    </div>
+}
